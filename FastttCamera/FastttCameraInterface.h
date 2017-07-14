@@ -96,6 +96,16 @@
 @property (nonatomic, assign) FastttCameraFlashMode cameraFlashMode;
 
 /**
+ *  The current torch mode.
+ */
+@property (nonatomic, assign) FastttCameraTorchMode cameraTorchMode;
+
+/**
+ *  Defaults to AVCaptureSessionPresetPhoto. This sets the quality level of the output image
+ */
+@property (nonatomic, assign) NSString *preferredSessionPreset;
+
+/**
  *  Check if flash is available for the current camera device.
  *
  *  @return YES if flash is available, NO if not.
@@ -108,6 +118,20 @@
  *  @return YES if flash is available, NO if not.
  */
 + (BOOL)isFlashAvailableForCameraDevice:(FastttCameraDevice)cameraDevice;
+
+/**
+ *  Check if torch is available for the current camera device.
+ *
+ *  @return YES if torch is available, NO if not.
+ */
+- (BOOL)isTorchAvailableForCurrentDevice;
+
+/**
+ *  Check if torch is available for the specified camera device.
+ *
+ *  @return YES if torch is available, NO if not.
+ */
++ (BOOL)isTorchAvailableForCameraDevice:(FastttCameraDevice)cameraDevice;
 
 /**
  *  Check if point focus is available for the specified camera device.
@@ -135,6 +159,11 @@
  *  @param touchPoint The point at which to focus the camera, if point focus is available.
  */
 - (void)focusAtPoint:(CGPoint)touchPoint;
+
+/**
+ *  Check if the session preset is supported for the current camera device.
+ */
+- (BOOL)isSessionPresetSupported:(NSString *)sessionPreset;
 
 
 #pragma mark - Take a picture!

@@ -18,11 +18,11 @@
     if (device.focusPointOfInterestSupported) {
         return YES;
     }
-    
+
     if (device.exposurePointOfInterestSupported) {
         return YES;
     }
-    
+
     return NO;
 }
 
@@ -32,20 +32,30 @@
     if ([device isFlashModeSupported:AVCaptureFlashModeOn]) {
         return YES;
     }
-    
+
+    return NO;
+}
+
++ (BOOL)isTorchAvailableForCameraDevice:(FastttCameraDevice)cameraDevice
+{
+    AVCaptureDevice *device = [self cameraDevice:cameraDevice];
+    if ([device isTorchModeSupported:AVCaptureTorchModeOn]) {
+        return YES;
+    }
+
     return NO;
 }
 
 + (AVCaptureDevice *)cameraDevice:(FastttCameraDevice)cameraDevice
 {
     NSArray *devices = [AVCaptureDevice devicesWithMediaType:AVMediaTypeVideo];
-    
+
     for (AVCaptureDevice *device in devices) {
         if ([device position] == [self _avPositionForDevice:cameraDevice]) {
             return device;
         }
     }
-    
+
     return nil;
 }
 
@@ -62,46 +72,65 @@
 - (BOOL)setCameraFlashMode:(FastttCameraFlashMode)cameraFlashMode
 {
     BOOL success = NO;
-    
+
     if ([self lockForConfiguration:nil]) {
-        
+
         AVCaptureFlashMode flashMode = [self.class _modeForFastttCameraFlashMode:cameraFlashMode];
-        
+
         if ([self isFlashModeSupported:flashMode]) {
             self.flashMode = flashMode;
             success = YES;
         }
-        
+
         [self unlockForConfiguration];
     }
-    
+
+    return success;
+}
+
+- (BOOL)setCameraTorchMode:(FastttCameraTorchMode)cameraTorchMode
+{
+    BOOL success = NO;
+
+    if ([self lockForConfiguration:nil]) {
+
+        AVCaptureTorchMode torchMode = [self.class _modeForFastttCameraTorchMode:cameraTorchMode];
+
+        if ([self isTorchModeSupported:torchMode]) {
+            self.torchMode = torchMode;
+            success = YES;
+        }
+
+        [self unlockForConfiguration];
+    }
+
     return success;
 }
 
 - (BOOL)focusAtPointOfInterest:(CGPoint)pointOfInterest
 {
     if ([self lockForConfiguration:nil]) {
-        
+
         if ([self isFocusModeSupported:AVCaptureFocusModeContinuousAutoFocus]) {
             self.focusMode = AVCaptureFocusModeContinuousAutoFocus;
         }
-        
+
         if ([self isExposureModeSupported:AVCaptureExposureModeContinuousAutoExposure]) {
             self.exposureMode = AVCaptureExposureModeContinuousAutoExposure;
         }
-        
+
         if (self.focusPointOfInterestSupported) {
             self.focusPointOfInterest = pointOfInterest;
         }
-        
+
         if (self.exposurePointOfInterestSupported) {
             self.exposurePointOfInterest = pointOfInterest;
         }
-        
+
         [self unlockForConfiguration];
         return YES;
     }
-    
+
     return NO;
 }
 
@@ -112,35 +141,56 @@
     switch (cameraDevice) {
         case FastttCameraDeviceFront:
             return AVCaptureDevicePositionFront;
-            
+
         case FastttCameraDeviceRear:
             return AVCaptureDevicePositionBack;
-            
+
         default:
             break;
     }
-    
+
     return AVCaptureDevicePositionUnspecified;
 }
 
 + (AVCaptureFlashMode)_modeForFastttCameraFlashMode:(FastttCameraFlashMode)cameraFlashMode
 {
     AVCaptureFlashMode mode;
-    
+
     switch (cameraFlashMode) {
         case FastttCameraFlashModeOn:
             mode = AVCaptureFlashModeOn;
             break;
-            
+
         case FastttCameraFlashModeOff:
             mode = AVCaptureFlashModeOff;
             break;
-            
+
         case FastttCameraFlashModeAuto:
             mode = AVCaptureFlashModeAuto;
             break;
     }
-    
+
+    return mode;
+}
+
++ (AVCaptureTorchMode)_modeForFastttCameraTorchMode:(FastttCameraTorchMode)cameraTorchMode
+{
+    AVCaptureTorchMode mode;
+
+    switch (cameraTorchMode) {
+        case FastttCameraFlashModeOn:
+            mode = AVCaptureTorchModeOn;
+            break;
+
+        case FastttCameraFlashModeOff:
+            mode = AVCaptureTorchModeOff;
+            break;
+
+        case FastttCameraFlashModeAuto:
+            mode = AVCaptureTorchModeAuto;
+            break;
+    }
+
     return mode;
 }
 
